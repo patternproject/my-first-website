@@ -12,15 +12,10 @@ function App() {
     const scriptURL = 'https://script.google.com/macros/s/AKfycbwjFdszOhsySeagg9Q6xA72Sq4SBtbqT8bkXJ_g0y0LVl6QEEu1DhJpMjmeNhWlXPdc-g/exec';
     
     try {
-      const response = await fetch(scriptURL, {
-        method: 'POST',
-        //mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email })
+      const response = await fetch(scriptURL + '?email=' + encodeURIComponent(email), {
+        method: 'GET',
       });
-      // Log response for debugging
+      
       console.log('Response:', response);
       
       setSubmitted(true);
