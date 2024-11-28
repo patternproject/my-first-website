@@ -7,18 +7,33 @@ function App() {
   const [error, setError] = useState('');
 
   // Replace with YOUR actual Google Apps Script Web App URL
-  const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjFdszOhsySeagg9Q6xA72Sq4SBtbqT8bkXJ_g0y0LVl6QEEu1DhJpMjmeNhWlXPdc-g/exec';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     try {
-      const response = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`, {
-        method: 'GET',
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `email=${encodeURIComponent(email)}`
       });
 
-      const result = await response.json();
+      // Log raw response for debugging
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON Parse Error:', parseError);
+        setError('Unable to process response');
+        return;
+      }
 
       if (result.status === 'success') {
         setSubmitted(true);
@@ -32,6 +47,7 @@ function App() {
     }
   };
 
+  // Rest of the component remains the same as in the previous example
   return (
     <div className="App" style={{
       display: 'flex',
