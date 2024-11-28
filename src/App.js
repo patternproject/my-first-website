@@ -4,25 +4,31 @@ import './App.css';
 function App() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  // Replace with YOUR actual Google Apps Script Web App URL
+  const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Replace with your Google Apps Script Web App URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwjFdszOhsySeagg9Q6xA72Sq4SBtbqT8bkXJ_g0y0LVl6QEEu1DhJpMjmeNhWlXPdc-g/exec';
-    
+    setError('');
+
     try {
-      const response = await fetch(scriptURL + '?email=' + encodeURIComponent(email), {
+      const response = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`, {
         method: 'GET',
       });
-      
-      console.log('Response:', response);
-      
-      setSubmitted(true);
-      setEmail('');
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        setSubmitted(true);
+        setEmail('');
+      } else {
+        setError(result.message || 'Something went wrong');
+      }
     } catch (error) {
       console.error('Error:', error);
-      alert('Something went wrong. Please try again.');
+      setError('Network error. Please try again.');
     }
   };
 
@@ -63,6 +69,11 @@ function App() {
                 borderRadius: '5px'
               }}
             />
+            {error && (
+              <div style={{ color: 'red', marginBottom: '10px' }}>
+                {error}
+              </div>
+            )}
             <button 
               type="submit"
               style={{
