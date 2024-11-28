@@ -14,12 +14,14 @@ function App() {
     try {
       const response = await fetch(scriptURL, {
         method: 'POST',
-        mode: 'no-cors',
+        //mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email: email })
       });
+      // Log response for debugging
+      console.log('Response:', response);
       
       setSubmitted(true);
       setEmail('');
