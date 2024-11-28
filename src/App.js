@@ -17,23 +17,14 @@ function App() {
       const response = await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: `email=${encodeURIComponent(email)}`
+        body: JSON.stringify({ email: email })
       });
 
-      // Log raw response for debugging
-      const responseText = await response.text();
-      console.log('Raw response:', responseText);
+      const result = await response.json();
 
-      let result;
-      try {
-        result = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('JSON Parse Error:', parseError);
-        setError('Unable to process response');
-        return;
-      }
+      console.log('Server response:', result);
 
       if (result.status === 'success') {
         setSubmitted(true);
@@ -47,7 +38,7 @@ function App() {
     }
   };
 
-  // Rest of the component remains the same as in the previous example
+  // The rest of the component remains the same as in the previous example
   return (
     <div className="App" style={{
       display: 'flex',
