@@ -14,31 +14,53 @@ function App() {
     setError('');
 
     try {
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      // Try multiple content types and body formats
+      const fetchOptions = [
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: email })
         },
-        body: JSON.stringify({ email: email })
-      });
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `email=${encodeURIComponent(email)}`
+        }
+      ];
 
-      const result = await response.json();
+      let result;
+      for (let options of fetchOptions) {
+        try {
+          const response = await fetch(SCRIPT_URL, options);
+          result = await response.json();
+          
+          // Log full server response for debugging
+          console.log('Server response:', result);
 
-      console.log('Server response:', result);
-
-      if (result.status === 'success') {
-        setSubmitted(true);
-        setEmail('');
-      } else {
-        setError(result.message || 'Something went wrong');
+          if (result.status === 'success') {
+            setSubmitted(true);
+            setEmail('');
+            return;
+          }
+        } catch (fetchError) {
+          console.error('Fetch attempt failed:', fetchError);
+        }
       }
+
+      // If we get here, all fetch attempts failed
+      setError(result?.message || 'Something went wrong');
+
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Final error:', error);
       setError('Network error. Please try again.');
     }
   };
 
-  // The rest of the component remains the same as in the previous example
+  // Render remains the same as in previous examples
   return (
     <div className="App" style={{
       display: 'flex',
